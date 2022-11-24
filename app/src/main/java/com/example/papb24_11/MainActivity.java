@@ -22,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
     private NoteDao mNoteDao;
     private ExecutorService executorService;
     private ListView listView;
+    private int id = 0;
     private Button buttonAddNote, buttonEditNote;
     private EditText etTitle, etDesc,etDate;
 
@@ -56,12 +57,31 @@ public class MainActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                etTitle.setText(listView.getAdapter().getItem(i).);
-                etDesc.setText("");
-                etDate.setText("");
+                Note item = (Note) adapterView.getAdapter().getItem(i);
+                id = item.getId();
+                etTitle.setText(item.getTitle());
+                etDesc.setText(item.getDescription());
+                etDate.setText(item.getDate());
+            }
+        });
+        buttonEditNote.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                updateData(new Note(id, etTitle.getText().toString(),
+                    etDesc.getText().toString(), etDate.getText().toString()));
+                id = 0;
+                setEmptyField();
             }
         });
 
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Note item = (Note) adapterView.getAdapter().getItem(i);
+                deleteData(new Note(item.getId(), item.getTitle(), item.getDescription(), item.getDate()));
+                return false;
+            }
+        });
     }
 
 private void setEmptyField(){
@@ -87,9 +107,14 @@ private void setEmptyField(){
     }
 
     //function update data
-    private void updateData(Note note){}
+    private void updateData(Note note){
+        executorService.execute(()->mNoteDao.update(note));
+    }
 
     //function delete
-    private void deleteData(Note note){}
+    private void deleteData(Note note){
+        executorService.execute(()->mNoteDao.delete(note));
+    }
+
 
 }
