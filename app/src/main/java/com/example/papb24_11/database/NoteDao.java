@@ -25,5 +25,11 @@ public interface NoteDao {
     @Query("SELECT * FROM note ORDER BY id ASC")
     LiveData<List<Note>> getAllNotes();
 
+    //Query ber parameter
+    @Query("SELECT * FROM note where id = 'keyword' ")
+    LiveData<List<Note>> getNotes(int keyword);
+    @Query("SELECT * FROM note where id = :keyword ")
+    LiveData<List<Note>> getNote(int keyword);
+
 
 }
